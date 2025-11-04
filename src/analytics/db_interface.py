@@ -8,4 +8,4 @@ def preview_table(table, n=5):
     return df
 
 if __name__ == "__main__":
-    print(preview_table("TrackingResults_Conical"))
+    print(preview_table("Detections_CFAR"))

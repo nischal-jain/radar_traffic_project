@@ -58,3 +58,45 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # -----------------------------
+    # Cognitive Radar Adaptation
+    # -----------------------------
+    st.subheader("Cognitive Radar Adaptation Feedback")
+
+    conn = sqlite3.connect(DB)
+    try:
+        df_cog = pd.read_sql_query("SELECT * FROM RadarConfig", conn)
+        conn.close()
+
+        if len(df_cog) > 0:
+            st.write(f"Loaded {len(df_cog)} cognitive adaptation cycles.")
+
+            import plotly.graph_objects as go
+            fig_cog = go.Figure()
+
+            fig_cog.add_trace(go.Scatter(
+                x=df_cog["iteration"], y=df_cog["pulse_width"]*1e6,
+                mode='lines+markers', name='Pulse Width (µs)'
+            ))
+            fig_cog.add_trace(go.Scatter(
+                x=df_cog["iteration"], y=df_cog["detection_threshold"],
+                mode='lines+markers', name='Detection Threshold'
+            ))
+            fig_cog.add_trace(go.Scatter(
+                x=df_cog["iteration"], y=df_cog["avg_snr"],
+                mode='lines+markers', name='Average SNR (dB)'
+            ))
+
+            fig_cog.update_layout(
+                title="Cognitive Radar Parameter Adaptation",
+                xaxis_title="Cycle",
+                yaxis_title="Value",
+                legend_title="Parameter",
+                template="plotly_white"
+            )
+            st.plotly_chart(fig_cog, use_container_width=True)
+
+        else:
+            st.info("No cognitive radar data found. Run cognitive_radar.py first.")
+    except Exception as e:
+        st.warning(f"Cognitive radar data not found: {e}")
